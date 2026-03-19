@@ -1,40 +1,44 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
+
 import '../models/mahasiswa_aktif_model.dart';
 
 class MahasiswaAktifRepository {
+  final Dio _dio = Dio();
+
   /// Mendapatkan daftar mahasiswa aktif
   Future<List<MahasiswaAktifModel>> getMahasiswaAktifList() async {
-    // Simulasi network delay
-    await Future.delayed(const Duration(seconds: 1));
+    const url = 'https://jsonplaceholder.typicode.com/posts';
 
-    // Data dummy mahasiswa aktif
-    return [
-      MahasiswaAktifModel(
-        nama: 'Raka Pratama',
-        nim: '2341760001',
-        email: 'raka.pratama@student.ac.id',
-        jurusan: 'Teknik Informatika',
-        semester: 4,
-        ipk: 3.85,
-        status: 'Aktif',
-      ),
-      MahasiswaAktifModel(
-        nama: 'Dian Safitri',
-        nim: '2341760002',
-        email: 'dian.safitri@student.ac.id',
-        jurusan: 'Teknik Informatika',
-        semester: 4,
-        ipk: 3.92,
-        status: 'Aktif',
-      ),
-      MahasiswaAktifModel(
-        nama: 'Budi Santoso',
-        nim: '2341760003',
-        email: 'budi.santoso@student.ac.id',
-        jurusan: 'Teknik Informatika',
-        semester: 6,
-        ipk: 3.70,
-        status: 'Aktif',
-      ),
-    ];
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) {
+          return MahasiswaAktifModel.fromJson(
+            Map<String, dynamic>.from(json as Map),
+          );
+        }).toList();
+      }
+    } catch (_) {
+      // Fallback ke dio jika http gagal.
+    }
+
+    final response = await _dio.get<List<dynamic>>(url);
+    if (response.statusCode == 200 && response.data != null) {
+      return response.data!.map((json) {
+        return MahasiswaAktifModel.fromJson(
+          Map<String, dynamic>.from(json as Map),
+        );
+      }).toList();
+    }
+
+    throw Exception('Gagal memuat data mahasiswa aktif dari API');
   }
 }

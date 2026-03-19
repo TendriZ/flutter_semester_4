@@ -107,7 +107,7 @@ class _ModernMahasiswaAktifCardState extends State<ModernMahasiswaAktifCard>
                   ),
                   child: Center(
                     child: Text(
-                      widget.mahasiswa.nama.substring(0, 1).toUpperCase(),
+                      widget.mahasiswa.title.substring(0, 1).toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -127,7 +127,7 @@ class _ModernMahasiswaAktifCardState extends State<ModernMahasiswaAktifCard>
                         children: [
                           Expanded(
                             child: Text(
-                              widget.mahasiswa.nama,
+                              widget.mahasiswa.title,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -147,7 +147,7 @@ class _ModernMahasiswaAktifCardState extends State<ModernMahasiswaAktifCard>
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              widget.mahasiswa.status,
+                              'Post #${widget.mahasiswa.id}',
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: Colors.green,
@@ -159,18 +159,13 @@ class _ModernMahasiswaAktifCardState extends State<ModernMahasiswaAktifCard>
                       ),
                       const SizedBox(height: 8),
                       _buildInfoRow(
-                        Icons.badge_outlined,
-                        'NIM: ${widget.mahasiswa.nim}',
+                        Icons.person_outline,
+                        'User ID: ${widget.mahasiswa.userId}',
                       ),
                       const SizedBox(height: 4),
                       _buildInfoRow(
-                        Icons.calendar_today_outlined,
-                        'Semester ${widget.mahasiswa.semester} · IPK ${widget.mahasiswa.ipk.toStringAsFixed(2)}',
-                      ),
-                      const SizedBox(height: 4),
-                      _buildInfoRow(
-                        Icons.school_outlined,
-                        widget.mahasiswa.jurusan,
+                        Icons.article_outlined,
+                        widget.mahasiswa.body,
                       ),
                     ],
                   ),
@@ -259,10 +254,10 @@ class MahasiswaAktifListView extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             child: ListTile(
               leading: CircleAvatar(
-                child: Text(mahasiswa.nama.substring(0, 1).toUpperCase()),
+                child: Text(mahasiswa.title.substring(0, 1).toUpperCase()),
               ),
-              title: Text(mahasiswa.nama),
-              subtitle: Text('NIM: ${mahasiswa.nim} · IPK ${mahasiswa.ipk}'),
+              title: Text(mahasiswa.title),
+              subtitle: Text('User ${mahasiswa.userId} · Post ${mahasiswa.id}'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             ),
           );

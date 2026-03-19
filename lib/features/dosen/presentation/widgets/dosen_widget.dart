@@ -106,7 +106,7 @@ class _ModernDosenCardState extends State<ModernDosenCard>
                   ),
                   child: Center(
                     child: Text(
-                      widget.dosen.nama.substring(0, 1).toUpperCase(),
+                      widget.dosen.name.substring(0, 1).toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -123,7 +123,7 @@ class _ModernDosenCardState extends State<ModernDosenCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.dosen.nama,
+                        widget.dosen.name,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -134,15 +134,15 @@ class _ModernDosenCardState extends State<ModernDosenCard>
                       ),
                       const SizedBox(height: 8),
                       _buildInfoRow(
-                        Icons.badge_outlined,
-                        'NIP: ${widget.dosen.nip}',
+                        Icons.account_circle_outlined,
+                        '@${widget.dosen.username}',
                       ),
                       const SizedBox(height: 4),
                       _buildInfoRow(Icons.email_outlined, widget.dosen.email),
                       const SizedBox(height: 4),
                       _buildInfoRow(
-                        Icons.school_outlined,
-                        widget.dosen.jurusan,
+                        Icons.location_on_outlined,
+                        '${widget.dosen.address.street}, ${widget.dosen.address.city}',
                       ),
                     ],
                   ),
@@ -187,6 +187,133 @@ class _ModernDosenCardState extends State<ModernDosenCard>
   }
 }
 
+class DosenCard extends StatelessWidget {
+  final DosenModel dosen;
+  final VoidCallback? onTap;
+
+  const DosenCard({super.key, required this.dosen, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppConstants.paddingMedium),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: Text(
+                  dosen.name.substring(0, 1).toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      dosen.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '@${dosen.username}',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                    Text(
+                      dosen.email,
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                    Text(
+                      '${dosen.address.street}, ${dosen.address.city}',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DosenEmptyState extends StatelessWidget {
+  final VoidCallback? onRefresh;
+
+  const DosenEmptyState({super.key, this.onRefresh});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.people_outline_rounded,
+              size: 48,
+              color: Colors.grey[400],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Tidak ada data dosen',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Belum ada dosen yang terdaftar',
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+          ),
+          if (onRefresh != null) ...[
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Refresh'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 /// Widget untuk menampilkan daftar dosen
 class DosenListView extends StatelessWidget {
   final List<DosenModel> dosenList;
@@ -203,7 +330,7 @@ class DosenListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (dosenList.isEmpty) {
-      return const Center(child: Text('Tidak ada data dosen'));
+      return DosenEmptyState(onRefresh: onRefresh);
     }
 
     return RefreshIndicator(
@@ -224,21 +351,24 @@ class DosenListView extends StatelessWidget {
               dosen: dosen,
               gradientColors: gradientColors,
               onTap: () {
-                // Handle tap
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Detail: ${dosen.name}'),
+                    behavior: SnackBarBehavior.floating,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
               },
             );
           }
 
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: ListTile(
-              leading: CircleAvatar(
-                child: Text(dosen.nama.substring(0, 1).toUpperCase()),
-              ),
-              title: Text(dosen.nama),
-              subtitle: Text('NIP: ${dosen.nip}'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            ),
+          return DosenCard(
+            dosen: dosen,
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Detail: ${dosen.name}')),
+              );
+            },
           );
         },
       ),

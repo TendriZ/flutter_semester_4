@@ -106,7 +106,7 @@ class _ModernMahasiswaCardState extends State<ModernMahasiswaCard>
                   ),
                   child: Center(
                     child: Text(
-                      widget.mahasiswa.nama.substring(0, 1).toUpperCase(),
+                      widget.mahasiswa.name.substring(0, 1).toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -123,7 +123,7 @@ class _ModernMahasiswaCardState extends State<ModernMahasiswaCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.mahasiswa.nama,
+                        widget.mahasiswa.name,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -134,8 +134,8 @@ class _ModernMahasiswaCardState extends State<ModernMahasiswaCard>
                       ),
                       const SizedBox(height: 8),
                       _buildInfoRow(
-                        Icons.badge_outlined,
-                        'NIM: ${widget.mahasiswa.nim}',
+                        Icons.account_tree_outlined,
+                        'Post ID: ${widget.mahasiswa.postId}',
                       ),
                       const SizedBox(height: 4),
                       _buildInfoRow(
@@ -144,8 +144,8 @@ class _ModernMahasiswaCardState extends State<ModernMahasiswaCard>
                       ),
                       const SizedBox(height: 4),
                       _buildInfoRow(
-                        Icons.school_outlined,
-                        '${widget.mahasiswa.jurusan} - ${widget.mahasiswa.angkatan}',
+                        Icons.subject_outlined,
+                        widget.mahasiswa.body,
                       ),
                     ],
                   ),
@@ -234,10 +234,10 @@ class MahasiswaListView extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             child: ListTile(
               leading: CircleAvatar(
-                child: Text(mahasiswa.nama.substring(0, 1).toUpperCase()),
+                child: Text(mahasiswa.name.substring(0, 1).toUpperCase()),
               ),
-              title: Text(mahasiswa.nama),
-              subtitle: Text('NIM: ${mahasiswa.nim}'),
+              title: Text(mahasiswa.name),
+              subtitle: Text('Post ID: ${mahasiswa.postId}'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             ),
           );
