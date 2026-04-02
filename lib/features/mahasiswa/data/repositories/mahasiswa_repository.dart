@@ -1,40 +1,25 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
-
-import '../models/mahasiswa_model.dart';
+import 'package:flutter_semester_4/core/network/dio_client.dart';
+import 'package:flutter_semester_4/features/mahasiswa/data/models/mahasiswa_model.dart';
 
 class MahasiswaRepository {
-  final Dio _dio = Dio();
+  final DioClient _dioClient;
 
-  /// Mendapatkan daftar mahasiswa
+  MahasiswaRepository({DioClient? dioClient})
+      : _dioClient = dioClient ?? DioClient();
+
+  /// get data daftar mahasiswa dari API /comments
   Future<List<MahasiswaModel>> getMahasiswaList() async {
-    const url = 'https://jsonplaceholder.typicode.com/comments';
-
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'Accept': 'application/json'},
+      final Response response = await _dioClient.dio.get('/comments');
+      final List<dynamic> data = response.data;
+      return data.map((json) => MahasiswaModel.fromJson(json)).toList();
+    } on DioException catch (e) {
+      throw Exception(
+        'Gagal memuat data mahasiswa: ${e.response?.statusCode} - ${e.message}',
       );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) {
-          return MahasiswaModel.fromJson(Map<String, dynamic>.from(json as Map));
-        }).toList();
-      }
-    } catch (_) {
-      // Fallback ke dio jika http gagal.
     }
-
-    final response = await _dio.get<List<dynamic>>(url);
-    if (response.statusCode == 200 && response.data != null) {
-      return response.data!.map((json) {
-        return MahasiswaModel.fromJson(Map<String, dynamic>.from(json as Map));
-      }).toList();
-    }
-
-    throw Exception('Gagal memuat data mahasiswa dari API');
   }
 }
+
+
